@@ -1,64 +1,79 @@
+#---------------------------------------------------------  
+#
+# Copyright (c) Trym Lund Flogard. All rights reserved.  
+# This code is licensed under the MIT License (MIT).  
+# THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF  
+# ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY  
+# IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR  
+# PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.  
+#  
+#---------------------------------------------------------
 from Cocoa import *
 import objc
 import time
 import psutil
+import sys
 import os
 
-# ----------------- Settings ------------------
-waitTime = 15  # seconds to wait for user to click LockDown URL
-appName = "He3"  # actual Helium app is "He3" in process list
-# ---------------------------------------------
+waitTime = 15 # time before activating
+appName = "He3" #application to bring to front
 
 def get_helium_pids():
+    #Iterate over the all the running process
     pids = []
     for proc in psutil.process_iter():
         try:
+            # Check if process name contains the given name string.
             if appName.lower() in proc.name().lower():
-                pids.append(proc.pid)
+                pids.append(proc.pid) #append to pids list if more than one instance running
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return pids
 
 def bring_to_front(pids):
-    for pid in pids:
-        print(f"Attempting to bring PID {pid} to front...")
-        x = NSRunningApplication.runningApplicationWithProcessIdentifier_(pid)
-        if x is not None:
-            try:
-                x.hide()
-                time.sleep(1)
-                x.unhide()
-                print(f"✅ PID {pid} was brought to front.")
-            except Exception as e:
-                print(f"⚠️ Failed to bring to front: {e}")
-        else:
-            print(f"⚠️ PID {pid} not found as running application (x is None).")
+    for i in pids:
+        time.sleep(1)
+        x = NSRunningApplication.runningApplicationWithProcessIdentifier_(i)
+        x.hide()
+        time.sleep(1)
 
-def launch_helium(instances=1):
-    print(f"🔁 Launching {instances} instance(s) of {appName}...")
-    for _ in range(instances):
-        os.system(f"open -n -a {appName}.app")
+        x.unhide()
+        print(f"{i} was unhid!")
+
+pid = get_helium_pids()
+pid_length = len(pid)
+if (not pid):
+  print(appName + "not running")
+  print("Open " + appName + "? Y / N")
+  inp = input()[0].lower()
+  if(inp == 'y'):
+    # opens helium
+    inp2 = input("How many instances?")
+    print("opening " + appName)
+    for i in range(int(inp2)):
+        os.system(f"open -n {appName}.app")
+    time.sleep(0.5)
+    pid = get_helium_pids() # assigns new pid
+    pid_length = len(pid)
+  else:
+    print("okay closing...")
     time.sleep(1)
+    exit()
 
-# Step 1: Ensure Helium is running
-helium_pids = get_helium_pids()
-if not helium_pids:
-    print(f"⚠️ {appName} not running. Launching now...")
-    launch_helium(instances=1)
-    helium_pids = get_helium_pids()
-    if not helium_pids:
-        print("❌ Failed to launch Helium.")
-        exit(1)
+print(appName + " found!")
+print("PID:" + str(pid))
 
-# Step 2: Wait for user to launch LockDown
-print(f"✅ {appName} found with PID(s): {helium_pids}")
-print(f"⏳ You have {waitTime} seconds to launch LockDown Browser URL...")
-
+print("you have " + str(waitTime) + "seconds")
 for i in reversed(range(waitTime)):
-    print(f"{i}...")
-    time.sleep(1)
+  time.sleep(1)
+  print(str(i) + "...")
 
-# Step 3: Bring Helium to front
-bring_to_front(helium_pids)
+bring_to_front(pid)
 
-print("✅ Done. Helium should now stay on top.")
+while True:
+    time.sleep(120)
+    while len(get_helium_pids()) is not pid_length:
+        os.system(f"open -n {appName}.app")
+        print(f"opened {appName} again")
+        bring_to_front(get_helium_pids())
+print("DONE")
