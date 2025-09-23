@@ -16,7 +16,7 @@ import sys
 import os
 
 waitTime = 15 # time before activating
-appName = "Helium" #application to bring to front
+appName = "He3" #application to bring to front
 
 def get_helium_pids():
     #Iterate over the all the running process
