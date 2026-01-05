@@ -1,1 +1,1 @@
-python3 -m pip install psutil pyobjc
+pip install psutil==7.2.1 pyobjc-core==12.1 pyobjc-framework-Cocoa==12.1
