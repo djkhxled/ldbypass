@@ -13,16 +13,18 @@ If you are on Windows, and you have a little programming experience, you can sim
 
 ## Prerequisites
 1. Helium (Download from Mac Appstore under "He3")
-1. Python 3. If you don't have Python 3, (check with `$ which python3`), see [this resource](https://installpython3.com/mac/).
+1. Python 3
+2. A brain
 
 ## Installation
 1. Download Helium from app store (Under He3).
+2. Download Python3 from [here](https://www.python.org/downloads/)
 ## Usage
 1. Place Helium app inside of lockdown-browser-bypass directory (search in spotlight, drag into folder) **THIS IS NEEDED**
-2. Start Helium
-3. Drag your prefered link into the browser. Literally highlight it in your browser window and then click and drag it into the He3 window.
-4. Start the script from termina;: `python3 ~/Documents/lockdown-browser-bypass/lockdown-bypass.py`   
-5. Now, click a valid lockdown browser URL to start the lockdown browser session and you now have access to that weblink of choice.
+3. Start Helium
+4. Drag your prefered link into the browser. Literally highlight it in your browser window and then click and drag it into the He3 window.
+5. Start the script from termina;: `python3 ~/Documents/lockdown-browser-bypass/lockdown-bypass.py`   
+6. Now, click a valid lockdown browser URL to start the lockdown browser session and you now have access to that weblink of choice.
 You can use [this site](https://webassign.com/instructors/features/secure-testing/lockdown-browser/) to test it out
 
 ## Troubleshooting
