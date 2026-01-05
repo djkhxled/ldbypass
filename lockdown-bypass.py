@@ -1,79 +1,75 @@
-#---------------------------------------------------------  
-#
-# Copyright (c) Trym Lund Flogard. All rights reserved.  
-# This code is licensed under the MIT License (MIT).  
-# THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF  
-# ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY  
-# IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR  
-# PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.  
-#  
-#---------------------------------------------------------
 from Cocoa import *
+import Quartz
 import objc
 import time
 import psutil
 import sys
 import os
 
-waitTime = 15 # time before activating
-appName = "He3" #application to bring to front
+waitTime = 15
+appName = "He3"
+toggle_key = (ord("`"), Quartz.kCGEventFlagMaskCommand)  # unused now but kept
+
+# NEW: use hardware keycode for backtick (US layout)
+BACKTICK_KEYCODE = 50
 
 def get_helium_pids():
-    #Iterate over the all the running process
     pids = []
     for proc in psutil.process_iter():
         try:
-            # Check if process name contains the given name string.
             if appName.lower() in proc.name().lower():
-                pids.append(proc.pid) #append to pids list if more than one instance running
+                pids.append(proc.pid)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return pids
 
-def bring_to_front(pids):
-    for i in pids:
-        time.sleep(1)
-        x = NSRunningApplication.runningApplicationWithProcessIdentifier_(i)
-        x.hide()
-        time.sleep(1)
+def toggle_visibility(pids):
+    for pid in pids:
+        app = NSRunningApplication.runningApplicationWithProcessIdentifier_(pid)
+        if not app:
+            # skip helpers/exited PIDs so we don't crash
+            continue
+        if app.isHidden():
+            app.unhide()
+            print(f"{pid} was unhid!")
+        else:
+            app.hide()
+            print(f"{pid} was hidden!")
 
-        x.unhide()
-        print(f"{i} was unhid!")
+def event_callback(proxy, event_type, event, refcon):
+    if event_type == Quartz.kCGEventKeyDown:
+        keycode = Quartz.CGEventGetIntegerValueField(event, Quartz.kCGKeyboardEventKeycode)
+        # toggle when the backtick key is pressed (no modifier requirement)
+        if keycode == BACKTICK_KEYCODE:
+            pids = get_helium_pids()
+            if pids:
+                toggle_visibility(pids)
+    return event
 
-pid = get_helium_pids()
-pid_length = len(pid)
-if (not pid):
-  print(appName + "not running")
-  print("Open " + appName + "? Y / N")
-  inp = input()[0].lower()
-  if(inp == 'y'):
-    # opens helium
-    inp2 = input("How many instances?")
-    print("opening " + appName)
-    for i in range(int(inp2)):
-        os.system(f"open -n {appName}.app")
-    time.sleep(0.5)
-    pid = get_helium_pids() # assigns new pid
-    pid_length = len(pid)
-  else:
-    print("okay closing...")
-    time.sleep(1)
-    exit()
+def start_event_listener():
+    event_mask = (1 << Quartz.kCGEventKeyDown)
+    tap = Quartz.CGEventTapCreate(
+        Quartz.kCGSessionEventTap,
+        Quartz.kCGHeadInsertEventTap,
+        Quartz.kCGEventTapOptionDefault,
+        event_mask,
+        event_callback,
+        None
+    )
+    if not tap:
+        print("Failed to create event tap")
+        exit(1)
 
-print(appName + " found!")
-print("PID:" + str(pid))
+    run_loop_source = Quartz.CFMachPortCreateRunLoopSource(None, tap, 0)
+    Quartz.CFRunLoopAddSource(
+        Quartz.CFRunLoopGetCurrent(),
+        run_loop_source,
+        Quartz.kCFRunLoopCommonModes
+    )
+    Quartz.CGEventTapEnable(tap, True)
+    Quartz.CFRunLoopRun()
 
-print("you have " + str(waitTime) + "seconds")
-for i in reversed(range(waitTime)):
-  time.sleep(1)
-  print(str(i) + "...")
+if __name__ == "__main__":
+    print("Waiting for hotkey: Press '`' to toggle window visibility")
+    start_event_listener()
 
-bring_to_front(pid)
-
-while True:
-    time.sleep(120)
-    while len(get_helium_pids()) is not pid_length:
-        os.system(f"open -n {appName}.app")
-        print(f"opened {appName} again")
-        bring_to_front(get_helium_pids())
-print("DONE")
