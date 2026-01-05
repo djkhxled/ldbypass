@@ -23,8 +23,9 @@ If you are on Windows, and you have a little programming experience, you can sim
 1. Place Helium app inside of lockdown-browser-bypass directory (search in spotlight, drag into folder) **THIS IS NEEDED**
 3. Start Helium
 4. Drag your prefered link into the browser. Literally highlight it in your browser window and then click and drag it into the He3 window.
-5. Start the script from termina;: `python3 ~/Documents/lockdown-browser-bypass/lockdown-bypass.py`   
-6. Now, click a valid lockdown browser URL to start the lockdown browser session and you now have access to that weblink of choice.
+5. Start the script from termina;: `python3 ~/Documents/lockdown-browser-bypass/lockdown-bypass.py`
+   It will ask you to give access to accessibility settings. Click okay and then once you are redirected into settings, click the toggle for "terminal"
+6. Once you run it again with access to accessibility, click a valid lockdown browser URL to start the lockdown browser session and you now have access to that weblink of choice.
 You can use [this site](https://webassign.com/instructors/features/secure-testing/lockdown-browser/) to test it out
 
 ## Troubleshooting
