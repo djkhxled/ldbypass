@@ -19,6 +19,7 @@ If you are on Windows, and you have a little programming experience, you can sim
 ## Installation
 1. Download Helium from app store (Under He3).
 2. Download Python3 from [here](https://www.python.org/downloads/)
+3. Now install the requirements from requirements.txt (just run the lines in terminal)
 ## Usage
 1. Place Helium app inside of lockdown-browser-bypass directory (search in spotlight, drag into folder) **THIS IS NEEDED**
 3. Start Helium
